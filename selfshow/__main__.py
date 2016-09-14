@@ -22,10 +22,11 @@ if(os.path.exists(db_path)):
                 'body': None, 'human_readable': False, 'pactive': None, 'tactive': None,
                 'ratios': None, 'active': None, 'min_keys': None, 'tkeys': False, 'title':
                 None, 'limit': None, 'pkeys': False})
-    ss.do()
+    #  ss.do()
 else:
     print("exit")
     exit()
 
 window.show()
+window.raise_()
 sys.exit(app.exec_())
