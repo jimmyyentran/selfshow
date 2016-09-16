@@ -45,6 +45,7 @@ class KeyStrokeWidget(GraphicsView):
         #make the numbers large to show that the xrange shows data from 10000 to all the way 0
         self.data1 = 10000 + 15000 * pg.gaussianFilter(np.random.random(size=10000), 10) + 3000 * np.random.random(size=10000)
         self.data2 = 15000 + 15000 * pg.gaussianFilter(np.random.random(size=10000), 10) + 3000 * np.random.random(size=10000)
+        print(self.data2)
 
         self.p1.plot(self.data1, pen="r")
         self.p1.plot(self.data2, pen="g")
