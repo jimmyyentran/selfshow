@@ -3,6 +3,7 @@ import os
 import logging
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from mainwindow import Ui_MainWindow
+from model import Model
 
 DB_DIR = ".selfspy"
 DB_NAME = "selfspy.sqlite"
@@ -31,6 +32,10 @@ if(os.path.exists(db_path)):
 else:
     print("exit")
     exit()
+
+mod = Model(db_path)
+ui.graphicsView.setData(mod.query_keys())
+ui.graphicsView.run()
 
 window.show()
 sys.exit(app.exec_())

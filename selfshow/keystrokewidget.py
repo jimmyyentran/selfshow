@@ -1,8 +1,20 @@
-import pyqtgraph as pg
 import numpy as np
+import pyqtgraph as pg
+from pyqtgraph.graphicsItems.AxisItem import AxisItem
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.graphicsItems.GraphicsLayout import GraphicsLayout
 from pyqtgraph.widgets.GraphicsView import GraphicsView
+
+class TimeAxisItem(AxisItem):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        #  super(TimeAxisItem, self).__init__(*args, **kwargs)
+
+    def tickStrings(self, values, scale, spacing):
+        # PySide's QTime() initialiser fails miserably and dismisses args/kwargs
+        #return [QTime().addMSecs(value).toString('mm:ss') for value in values]
+        return [int2dt(value).strftime("%H:%M:%S.%f") for value in values]
+
 
 class KeyStrokeWidget(GraphicsView):
     """
@@ -23,11 +35,14 @@ class KeyStrokeWidget(GraphicsView):
             setattr(self, n, getattr(self.ci, n))
         self.setCentralItem(self.ci)
 
+    def run(self):
         win = self
 
         win.setWindowTitle('pyqtgraph example: crosshair')
         self.label = pg.LabelItem(justify='right')
         win.addItem(self.label)
+        #  self.p1 = win.addPlot(row=1, col=0,
+            #  axisItems={'bottom': TimeAxisItem(orientation='bottom')})
         self.p1 = win.addPlot(row=1, col=0)
         self.p2 = win.addPlot(row=2, col=0)
 
@@ -43,12 +58,12 @@ class KeyStrokeWidget(GraphicsView):
 
         #create numpy arrays
         #make the numbers large to show that the xrange shows data from 10000 to all the way 0
-        self.data1 = 10000 + 15000 * pg.gaussianFilter(np.random.random(size=10000), 10) + 3000 * np.random.random(size=10000)
-        self.data2 = 15000 + 15000 * pg.gaussianFilter(np.random.random(size=10000), 10) + 3000 * np.random.random(size=10000)
-        print(self.data2)
+        #  self.data1 = 10000 + 15000 * pg.gaussianFilter(np.random.random(size=10000), 10) + 3000 * np.random.random(size=10000)
+        #  self.data2 = 15000 + 15000 * pg.gaussianFilter(np.random.random(size=10000), 10) + 3000 * np.random.random(size=10000)
 
         self.p1.plot(self.data1, pen="r")
-        self.p1.plot(self.data2, pen="g")
+        #  self.p1.plot = self.win.addPlot(title='Timed data', axisItems={'bottom': TimeAxisItem(orientation='bottom')})
+        #  self.p1.plot(self.data2, pen="g")
 
         self.p2.plot(self.data1, pen="w")
 
@@ -56,7 +71,7 @@ class KeyStrokeWidget(GraphicsView):
 
         self.p1.sigRangeChanged.connect(self.updateRegion)
 
-        self.region.setRegion([1000, 2000])
+        #  self.region.setRegion([1000, 2000])
 
         #cross hair
         self.vLine = pg.InfiniteLine(angle=90, movable=False)
@@ -86,15 +101,23 @@ class KeyStrokeWidget(GraphicsView):
         if self.p1.sceneBoundingRect().contains(pos):
             mousePoint = self.vb.mapSceneToView(pos)
             index = int(mousePoint.x())
-            if index > 0 and index < len(self.data1):
+            if index > 0 and index < self.data1[-1]['x']:
                 self.label.setText(
-                        """<span style='font-size: 12pt'>x=%0.1f, 
-                        <span style='color: red'>y1=%0.1f</span>,
-                        <span style='color: green'>y2=%0.1f</span>
+                        #  """<span style='font-size: 12pt'>x=%f, 
+                        #  <span style='color: red'>y1=%0.1f</span>,
+                        #  <span style='color: green'>y2=%0.1f</span>
+                        #  """ % (mousePoint.x(),
+                        """<span style='font-size: 12pt'>x=%i, 
+                        <span style='color: red'>y1=%i</span>
                         """ % (mousePoint.x(),
-                        self.data1[index], self.data2[index]))
+                            mousePoint.y()))
+                        #  self.data1[index], self.data2[index]))
+                        #  self.data1[index]))
             self.vLine.setPos(mousePoint.x())
             self.hLine.setPos(mousePoint.y())
+
+    def setData(self, data):
+        self.data1 = data
 
 ## Start Qt event loop unless running in interactive mode or using pyside.
 if __name__ == '__main__':
